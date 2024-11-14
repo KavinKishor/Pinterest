@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import Loader from "../Utilities/Loader";
 
 const Dashboard = () => {
+  //for fetching
   const [images, setImages] = useState([]);
-
+  //for new image
   const [image, setImage] = useState();
   const [tags, setTags] = useState();
   const [caption, setCaption] = useState("");
+  //for rendering
   const [liked, setLiked] = useState(false);
   const [follow, setFollow] = useState(false);
   const [newTags, setNewTags] = useState(false);
@@ -19,10 +21,13 @@ const Dashboard = () => {
   const [selectedFilter, setSelectedFilter] = useState("all");
 
   const [openForm, setOpenForm] = useState(false);
+  //username
   const userdata = localStorage.getItem("userDatas");
   const userName = JSON.parse(userdata).split("@")[0];
 
+  //fetch
   useEffect(() => {
+    setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
     }, 3000);
@@ -36,7 +41,7 @@ const Dashboard = () => {
       axios
         .get("http://localhost:5001/picture/allpictures", config)
         .then((res) => {
-          console.log(res.data.pictures);
+          // console.log(res.data.pictures);
 
           let filterdImage = res.data.pictures;
           if (selectedFilter === "liked") {
@@ -47,13 +52,17 @@ const Dashboard = () => {
             );
           }
           setImages(filterdImage);
+          setIsLoading(false);
         })
         .catch((err) => console.log(err));
+      setIsLoading(false);
     }
     fetchallimages();
   }, [liked, follow, newTags, newImg, selectedFilter]);
 
+  //upload new image
   const handleNewImage = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
     try {
       const config = {
@@ -61,7 +70,7 @@ const Dashboard = () => {
           Authorization: `Bearer ${localStorage.getItem("AuthToken")}`,
         },
       };
-      console.log(config);
+      // console.log(config);
 
       const formdata = new FormData();
       formdata.append("image", image);
@@ -71,16 +80,18 @@ const Dashboard = () => {
       await axios
         .post("http://localhost:5001/picture/newimage", formdata, config)
         .then((res) => {
-          console.log(res.data);
+          // console.log(res.data);
           toast.success(res.data.message);
           setNewImg((prev) => !prev);
           setCaption("");
           setTags("");
           setImage(null);
           setOpenForm(false);
+          setIsLoading(false);
         });
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
     }
   };
 
@@ -152,6 +163,10 @@ const Dashboard = () => {
       )}
       {isLoading ? (
         <Loader />
+      ) : images.length === 0 ? (
+        <p className="text-center mt-[100px] text-gray-400">
+          No images available!
+        </p>
       ) : (
         <div className="py-4 px-4 columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
           {Images &&
@@ -164,7 +179,9 @@ const Dashboard = () => {
                   setFollow={setFollow}
                   setNewTags={setNewTags}
                 />
-              ) : null
+              ) : (
+                <p className="text-gray-400 text-center">No Image available!</p>
+              )
             )}
         </div>
       )}

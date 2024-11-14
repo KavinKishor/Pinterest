@@ -10,6 +10,10 @@ app.listen(process.env.Port, () => {
   console.log(`Server Port is : ${process.env.Port}`);
 });
 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
+}
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("DB Connected"))
@@ -20,5 +24,3 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/user", userRouter);
 app.use("/picture", pictureRouter);
-
-module.exports = app; 

@@ -30,8 +30,8 @@ let createuser = asyncHandler(async (req, res) => {
 let loguser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
  
-  console.log(email, password);
-  console.log(req.body);
+  // console.log(email, password);
+  // console.log(req.body);
 
   try {
     const user = await User.findOne({ email });
@@ -55,7 +55,7 @@ let loguser = asyncHandler(async (req, res) => {
     const userToken = jwt.sign({ _id: user._id }, process.env.TOKEN, {
       expiresIn: "10d",
     });
-    console.log(userToken);
+    // console.log(userToken);
    
     
     return res.status(200).json({

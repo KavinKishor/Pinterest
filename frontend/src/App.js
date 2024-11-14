@@ -14,8 +14,6 @@ function App() {
         hideProgressBar={true}
         theme="colored"
       />
-      <h1>Welcome to My App</h1>
-
       <Routes>
         <Route path="/" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />

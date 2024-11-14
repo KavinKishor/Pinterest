@@ -26,7 +26,7 @@ const Images = ({ img, setLiked, setFollow, setNewTags }) => {
     await axios
       .post(`http://localhost:5001/picture/likepicture/${imgId}`, {}, config)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         toast.success(res.data.message);
         setLiked((prev) => !prev);
       })
@@ -92,7 +92,7 @@ const Images = ({ img, setLiked, setFollow, setNewTags }) => {
         )
         .then((res) => {
           toast.success(res.data.message);
-          console.log(res.data);
+          // console.log(res.data);
           setSelectedImg((prev) => ({
             ...prev,
             tags: prev.tags.filter((tag) => tag !== t),
@@ -116,7 +116,7 @@ const Images = ({ img, setLiked, setFollow, setNewTags }) => {
         <div className="absolute inset-0 flex justify-center items-center opacity-0 hover:opacity-80 transition-opacity">
           <div className="flex space-x-4 text-white">
             <div className="bg-yellow-500 rounded p-2 ">
-              {img.tags.length > 0
+              {img?.tags?.length > 0
                 ? img.tags[img.tags.length - 1]
                 : "No tags available"}
             </div>

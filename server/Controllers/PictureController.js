@@ -23,30 +23,36 @@ const newimage = asyncHandler(async (req, res) => {
 
 const likepicture = asyncHandler(async (req, res) => {
   const userId = req.user.toString();
-  console.log(userId);
-  console.log(req.params);
+  const pictureId = req.params.id;
 
   try {
-    const picture = await Picture.findById(req.params.id);
-    console.log(picture);
+    const picture = await Picture.findById(pictureId);
 
-    if (!picture) return res.json({ message: "No image available" });
+    if (!picture) {
+      return res.status(404).json({ message: "No image available" });
+    }
+
     if (!picture.likes.includes(userId)) {
-      picture.likes.push(userId);
+      picture.likes = [userId];
       await picture.save();
-      res.status(201).json({ message: "You liked this image" });
+      return res
+        .status(201)
+        .json({ message: "You liked the picture", picture });
     } else {
-      picture.likes = picture.likes.filter(
-        (id) => id.toString() !== userId.toString()
-      );
+      picture.likes = [];
       await picture.save();
-      res.status(200).json({ message: "you unliked" });
+      return res
+        .status(200)
+        .json({ message: "You unliked the picture", picture });
     }
   } catch (error) {
     console.log(error);
-    res.status(401).json({ message: "Error occured while like image", error });
+    res
+      .status(500)
+      .json({ message: "Error occurred while liking the image", error });
   }
 });
+
 const tagpicture = asyncHandler(async (req, res) => {
   const { tag } = req.body;
 
@@ -112,19 +118,16 @@ const deletetag = asyncHandler(async (req, res) => {
         .json({ success: false, message: "Invalid tag format" });
     }
     const tagIndex = picture.tags.indexOf(tag);
-    console.log(tagIndex);
+    // console.log(tagIndex);
     if (!tagIndex)
       return res.status(401).json({ message: "Tag not available" });
 
-      if (tagIndex === -1) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Tag not found" });
-      }
-      picture.tags.splice(tagIndex, 1);
-      await picture.save();
-      res.status(200).json({ message: "Tag deleted successfully", picture });
-    
+    if (tagIndex === -1) {
+      return res.status(400).json({ success: false, message: "Tag not found" });
+    }
+    picture.tags.splice(tagIndex, 1);
+    await picture.save();
+    res.status(200).json({ message: "Tag deleted successfully", picture });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error occurred", error });
